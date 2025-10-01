@@ -1,183 +1,411 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Gabungan</title>
-  <!-- Font & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Token NatusVincere</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #f8fafc;
-    }
-
-    /* ===== CSS SHADOWBUG (file 1) ===== */
-    #loading-screen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: #0f172a;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column;
-      z-index: 9999;
-      color: white;
-    }
-    .loading-text {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      margin-top: 1rem;
-      animation: blink 1.5s infinite;
-    }
-    @keyframes blink { 50% { opacity: 0.3; } }
-
-    #login-screen {
-      display: none;
-      height: 100vh;
-      display: flex; justify-content: center; align-items: center;
-      flex-direction: column;
-    }
-    .login-box {
-      background: white;
-      color: black;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      text-align: center;
-      width: 300px;
-      margin: 1rem;
-    }
-    .login-box h2 { margin-bottom: 1rem; }
-    .login-box input {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    .login-box button {
-      width: 100%;
-      padding: 0.7rem;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .login-box button:hover { background: #1e40af; }
-    .msg { margin-top: 1rem; font-size: 0.9rem; }
-
-    .container { display: none; padding: 2rem; }
+    :root { --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --line:#1f2937; --accent:#6366f1; --ok:#10b981; --err:#ef4444; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{border:1px solid var(--line);background:var(--panel);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .tab.active{outline:2px solid var(--accent)}
+    main{padding:20px;display:grid;place-items:start}
+    .wrap{width:100%;max-width:980px;display:grid;gap:14px}
+    .grid{display:grid;gap:14px}
+    @media(min-width:920px){ .grid{grid-template-columns:1.2fr .8fr} }
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    h2{margin:0 0 8px}
+    p{margin:0 0 10px;color:var(--muted)}
+    label{display:block;margin:10px 0 6px}
+    input,select,button,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:#e5e7eb;outline:none}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.25)}
+    button{background:var(--accent);border:none;font-weight:700;cursor:pointer}
+    button.ghost{background:#0b1220}
+    button.rowbtn{width:auto}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .kvs{display:grid;grid-template-columns:140px 1fr;gap:8px;margin-top:10px}
+    .muted{font-size:12px;color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .ok{border:1px solid rgba(16,185,129,.4);background:rgba(16,185,129,.08);color:#a7f3d0;border-radius:10px;padding:10px 12px}
+    .err{border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);color:#fecaca;border-radius:10px;padding:10px 12px}
+    .sep{height:1px;background:var(--line);margin:14px 0}
+    .tag{display:inline-block;background:#0b1220;border:1px solid var(--line);padding:4px 8px;border-radius:999px}
+    .list{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+    th{position:sticky;top:0;background:#0b1220}
+    .hidden{display:none}
   </style>
 </head>
 <body>
-  <!-- ===== LOADING SCREEN ===== -->
-  <div id="loading-screen">
-    <i class="fas fa-spinner fa-spin fa-3x"></i>
-    <div class="loading-text">Memuat...</div>
+<header>
+  <div class="brand">🔐 Token NatusVincere Apk</div>
+  <div class="tabs">
+    <div class="tab active" data-tab="bot">Token Akses</div>
+    <div class="tab" data-tab="api">API Verifier</div>
+    <div class="tab" data-tab="about">Kosong (biar menu rapi)</div>
   </div>
-
-  <!-- ===== LOGIN SCREEN (SHADOWBUG) ===== -->
-  <div id="login-screen">
-    <div class="login-box">
-      <h2>🔑 Login Username</h2>
-      <input id="username" placeholder="Username" />
-      <input id="password" type="password" placeholder="Password" />
-      <button onclick="loginUser()">Masuk</button>
-      <div class="msg" id="msg-user"></div>
-    </div>
-
-    <div class="login-box">
-      <h2>🔐 Login Token</h2>
-      <input id="token" placeholder="Masukkan token akses" />
-      <button onclick="loginToken()">Masuk</button>
-      <div class="msg" id="msg-token"></div>
-    </div>
+  <div style="margin-left:auto" class="row">
+    <span class="tag" id="modeTag">By: LuxJapanese-x</span>
   </div>
+</header>
 
-  <!-- ===== MAIN APP ===== -->
-  <div class="container" id="main-app">
-    <h1>🎉 Selamat datang di Aplikasi Gabungan!</h1>
-    <p>Anda berhasil login.</p>
+<main>
+  <div class="wrap">
+
+    <!-- BOT SIMULATOR -->
+    <section id="panel-bot" class="grid">
+      <div class="card">
+        <h2>NATUS VINCERE — APK</h2>
+        <p>disini adalah tempat token untuk akses apk natusvincere nya, buat pt lux jangn sebar domain ya pelerr. sebar? out no reff kontol🤡</p>
+        <div class="row">
+          <div style="flex:1">
+            <label>Jenis Token</label>
+            <select id="tokenType">
+              <option value="hex10">Hex 10 (mudah ditempel)</option>
+              <option value="num6">Angka 6 digit (OTP)</option>
+              <option value="hex16">Hex 16 (lebih kuat)</option>
+            </select>
+          </div>
+          <div style="width:220px">
+            <label>Masa Berlaku</label>
+            <select id="ttl">
+              <option value="300">5 menit</option>
+              <option value="600" selected>10 menit</option>
+              <option value="1800">30 menit</option>
+              <option value="3600">60 menit</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button id="btnGen" class="rowbtn">/gettoken</button>
+          <button id="btnList" class="rowbtn ghost">Lihat 10 Token Terakhir</button>
+          <button id="btnClear" class="rowbtn ghost">Hapus Semua Token</button>
+        </div>
+        <div id="botMsg" class="ok hidden" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h2>Database Load</h2>
+        <p>Disimpan di <span class="mono">(rahasia👻)</span> pengen tau juga? tanya depeloper😙.</p>
+        <div class="list" style="margin-top:10px">
+          <table id="tblTokens">
+            <thead><tr><th>Token</th><th>User</th><th>Kadaluarsa</th><th>Dipakai?</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:8px">Di produksi oleh t.me/BagindaLux, gunakan Database token ini untuk akses apk Nv dan sebagai “Vip” saat diverifikasi.</p>
+      </div>
+    </section>
+
+    <!-- API VERIFIER -->
+    <section id="panel-api" class="grid hidden">
+      <div class="card">
+        <h2>API Verifier</h2>
+        <p>Simulasi endpoint <span class="mono">POST /api/verify-token</span>. Frontend bisa memilih: verifikasi lokal (DEMO) atau ke backend sungguhan.</p>
+        <div class="kvs">
+          <div>Gunakan Backend?</div>
+          <div>
+            <select id="useBackend">
+              <option value="false" selected>Tidak (verifikasi di browser)</option>
+              <option value="true">Ya (kirim ke server)</option>
+            </select>
+          </div>
+          <div>URL Endpoint</div>
+          <div><input id="backendUrl" placeholder="https://example.com/api/verify-token" /></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <input id="verifyInput" placeholder="Tempel token untuk simulasi verifikasi" />
+          <button id="btnVerify" class="rowbtn">Verifikasi</button>
+        </div>
+        <div id="apiOut" class="ok hidden" style="margin-top:12px"></div>
+        <div id="apiErr" class="err hidden" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h2>Cara Hubungkan ke Server Asli</h2>
+        <ol>
+          <li>Pasang backend sesuai contoh (Flask/Express/dll) dengan endpoint <span class="mono">POST /api/verify-token</span>.</li>
+          <li>Ubah “Gunakan Backend?” → <strong>Ya</strong> dan isi URL endpoint kamu.</li>
+          <li>Frontend akan mengirim <span class="mono">{ token }</span> dan menampilkan hasil respon backend.</li>
+        </ol>
+        <p class="muted">Pastikan CORS di-backend mengizinkan origin halaman ini saat pengujian.</p>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="panel-about" class="grid hidden">
+      <div class="card">
+        <h2>Petunjuk Singkat</h2>
+        <ol>
+          <li>Masuk tab <strong>NATUS VINCERE</strong> → klik <span class="mono">/gettoken</span> untuk membuat token (contoh: <span class="mono">A1B2C3D4E5</span>).</li>
+          <li>Salin token → pergi ke tab <strong>Login App</strong> → tempel token → Verifikasi & Masuk.</li>
+          <li>Secara default, verifikasi dilakukan secara lokal (DEMO). Untuk menghubungkan server asli, buka tab <strong>API Verifier</strong>, pilih “Gunakan Backend: Ya”, dan isi URL endpoint kamu.</li>
+        </ol>
+        <p class="muted">Di produksi: token dikeluarkan oleh bot Telegram di server, disimpan di DB server, diverifikasi oleh endpoint server, dan ditandai “used” setelah dipakai.</p>
+      </div>
+      <div class="card">
+        <h2>Tips Keamanan</h2>
+        <ul>
+          <li>Gunakan token <strong>sekali pakai</strong> dan <strong>masa berlaku singkat</strong> (5–10 menit).</li>
+          <li>Validasi token <strong>hanya di server</strong> (jangan di frontend).</li>
+          <li>Rate limit permintaan token dari user.</li>
+          <li>Setelah verifikasi berhasil, berikan <strong>session/JWT</strong> untuk akses halaman berikutnya.</li>
+        </ul>
+      </div>
+    </section>
+
   </div>
+</main>
 
-  <!-- ===== Script ===== -->
-  <script>
-    // Loading
-    window.onload = () => {
-      setTimeout(() => {
-        document.getElementById("loading-screen").style.display = "none";
-        document.getElementById("login-screen").style.display = "flex";
-      }, 1500);
-    };
+<script>
+/* =========================
+   KONFIGURASI FRONTEND
+   ========================= */
+const cfg = {
+  USE_BACKEND: true, // ubah ke true jika ingin kirim verifikasi ke server
+  BACKEND_URL: "https://tokennv.vercel.app",    // isi saat USE_BACKEND=true, contoh: "https://domain.com/api/verify-token"
+  STORE_KEY: "-", // localStorage key untuk simulasi DB
+  SESSION_KEY: "-", // localStorage key untuk sesi login
+};
 
-    // Login Username
-    function loginUser() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg-user");
+/* =========================
+   UTIL
+   ========================= */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const show = el => el.classList.remove("hidden");
+const hide = el => el.classList.add("hidden");
+const fmtTime = ts => new Date(ts).toLocaleString();
 
-      if (!user || !pass) {
-        msg.textContent = "⚠️ Username & Password wajib diisi!";
-        msg.style.color = "red";
-        return;
-      }
-      if (user === "admin" && pass === "1234") {
-        msg.textContent = "✅ Login berhasil!";
-        msg.style.color = "green";
-        setTimeout(() => {
-          document.getElementById("login-screen").style.display = "none";
-          document.getElementById("main-app").style.display = "block";
-        }, 1000);
-      } else {
-        msg.textContent = "❌ Username atau password salah.";
-        msg.style.color = "red";
-      }
-    }
+function randomHex(len){ // len: jumlah hex chars
+  const n = Math.ceil(len/2);
+  const buf = new Uint8Array(n);
+  crypto.getRandomValues(buf);
+  return Array.from(buf).map(b => b.toString(16).padStart(2,"0")).join("").slice(0,len).toUpperCase();
+}
+function randomDigits(len){
+  let s = "";
+  while(s.length < len){
+    s += Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * 10).toString();
+  }
+  return s.slice(0,len);
+}
 
-    // Login Token
-    async function loginToken() {
-      const token = document.getElementById("token").value.trim();
-      const msg = document.getElementById("msg-token");
+/* =========================
+   SIMULASI "DB" TOKEN (LOCAL)
+   ========================= */
+function loadTokens(){
+  try { return JSON.parse(localStorage.getItem(cfg.STORE_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveTokens(list){
+  localStorage.setItem(cfg.STORE_KEY, JSON.stringify(list));
+  renderTable();
+}
+function upsertToken(row){ // {token,user_id,exp,used}
+  const list = loadTokens();
+  const i = list.findIndex(x => x.token === row.token);
+  if(i>=0) list[i] = row; else list.unshift(row);
+  saveTokens(list);
+}
+function markUsed(token){
+  const list = loadTokens();
+  const i = list.findIndex(x => x.token === token);
+  if(i>=0){ list[i].used = true; saveTokens(list); }
+}
 
-      if (!token) {
-        msg.textContent = "⚠️ Token tidak boleh kosong!";
-        msg.style.color = "red";
-        return;
-      }
+/* =========================
+   RENDER TABEL TOKEN
+   ========================= */
+function renderTable(){
+  const tbody = $("#tblTokens tbody");
+  tbody.innerHTML = "";
+  const now = Date.now();
+  loadTokens().slice(0,50).forEach(row=>{
+    const tr = document.createElement("tr");
+    const status = row.used ? "❌ ya" : (row.exp < now ? "⏰ kadaluarsa" : "✅ belum");
+    tr.innerHTML = `
+      <td class="mono">${row.token}</td>
+      <td>${row.user_id}</td>
+      <td>${fmtTime(row.exp)}</td>
+      <td>${status}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-      msg.textContent = "⏳ Memverifikasi token...";
-      msg.style.color = "black";
+/* =========================
+   TABS
+   ========================= */
+$$(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    $$(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const tab = t.dataset.tab;
+    ["bot","api","app","about"].forEach(id=>{
+      (id===tab) ? show($("#panel-"+id)) : hide($("#panel-"+id));
+    });
+  });
+});
 
-      try {
-        const res = await fetch("http://localhost:5000/api/verify-token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token })
-        });
-        const data = await res.json();
+/* =========================
+   BOT SIMULATOR
+   ========================= */
+renderTable();
+$("#btnGen").addEventListener("click", ()=>{
+  const type = $("#tokenType").value;
+  const ttl = parseInt($("#ttl").value,10)*1000;
+  const exp = Date.now()+ttl;
+  const userId = 1001; // untuk demo, seolah user Telegram id 1001
+  let token = "DEMO";
+  if(type==="hex10") token = randomHex(10);
+  if(type==="hex16") token = randomHex(16);
+  if(type==="num6")  token = randomDigits(6);
 
-        if (data.ok) {
-          msg.textContent = "✅ Login berhasil!";
-          msg.style.color = "green";
-          setTimeout(() => {
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-app").style.display = "block";
-          }, 1000);
-        } else {
-          msg.textContent = "❌ " + (data.message || "Token salah / kadaluarsa.");
-          msg.style.color = "red";
-        }
-      } catch (err) {
-        msg.textContent = "🚨 Gagal konek ke server: " + err.message;
-        msg.style.color = "red";
-      }
-    }
-  </script>
+  upsertToken({ token, user_id: userId, exp, used:false });
+
+  const msg = $("#botMsg");
+  msg.innerHTML = `🔑 Token kamu: <span class="mono">${token}</span><br>⏳ Berlaku sampai: <span class="mono">${fmtTime(exp)}</span><br>⚠️ Sekali pakai`;
+  show(msg);
+  navigator.clipboard?.writeText(token).catch(()=>{});
+});
+
+$("#btnList").addEventListener("click", renderTable);
+$("#btnClear").addEventListener("click", ()=>{
+  localStorage.removeItem(cfg.STORE_KEY);
+  renderTable();
+});
+
+/* =========================
+   API VERIFIER
+   ========================= */
+const modeTag = $("#modeTag");
+function refreshModeTag(){
+  if(cfg.USE_BACKEND && cfg.BACKEND_URL){
+    modeTag.textContent = "Mode: BACKEND";
+  } else {
+    modeTag.textContent = "";
+  }
+}
+$("#useBackend").addEventListener("change", (e)=>{
+  cfg.USE_BACKEND = e.target.value === "true";
+  refreshModeTag();
+});
+$("#backendUrl").addEventListener("input", (e)=>{
+  cfg.BACKEND_URL = e.target.value.trim();
+  refreshModeTag();
+});
+
+async function verifyLocal(token){
+  token = (token||"").trim().toUpperCase();
+  if(!token) throw new Error("Token kosong.");
+  const list = loadTokens();
+  const row = list.find(x => x.token === token);
+  if(!row) throw new Error("Token tidak ditemukan.");
+  if(row.used) throw new Error("Token sudah dipakai.");
+  if(row.exp < Date.now()) throw new Error("Token kadaluarsa.");
+  // tandai sebagai terpakai (sekali pakai)
+  markUsed(token);
+  return { ok:true, user:{ telegram_id: row.user_id }, exp: row.exp };
+}
+async function verifyRemote(token){
+  if(!cfg.BACKEND_URL) throw new Error("BACKEND_URL belum diisi.");
+  const res = await fetch(cfg.BACKEND_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ token })
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok || !data.ok) throw new Error(data.message || "Verifikasi gagal.");
+  return data;
+}
+
+$("#btnVerify").addEventListener("click", async ()=>{
+  hide($("#apiOut")); hide($("#apiErr"));
+  const token = $("#verifyInput").value;
+  try{
+    const data = cfg.USE_BACKEND ? await verifyRemote(token) : await verifyLocal(token);
+    const el = $("#apiOut");
+    el.textContent = JSON.stringify(data, null, 2);
+    show(el);
+  }catch(e){
+    const el = $("#apiErr");
+    el.textContent = e.message || "Gagal verifikasi.";
+    show(el);
+  }
+});
+
+/* =========================
+   LOGIN APP
+   ========================= */
+function saveSession(s){ localStorage.setItem(cfg.SESSION_KEY, JSON.stringify(s)); }
+function loadSession(){ try{ return JSON.parse(localStorage.getItem(cfg.SESSION_KEY)||"null"); }catch{return null;} }
+function clearSession(){ localStorage.removeItem(cfg.SESSION_KEY); }
+
+function toApp(){
+  hide($("#loginCard"));
+  show($("#appCard"));
+}
+function toLogin(){
+  show($("#loginCard"));
+  hide($("#appCard"));
+}
+
+async function doLogin(token){
+  const data = cfg.USE_BACKEND ? await verifyRemote(token) : await verifyLocal(token);
+  // simpan session minimal
+  saveSession({ ok:true, user:data.user, exp:data.exp, at:Date.now() });
+  return data;
+}
+
+$("#btnLogin").addEventListener("click", async ()=>{
+  hide($("#loginOut")); hide($("#loginErr"));
+  const token = $("#loginToken").value.trim();
+  try{
+    const data = await doLogin(token);
+    const el = $("#loginOut");
+    el.textContent = "Token valid. Mengalihkan ke area aplikasi…";
+    show(el);
+    setTimeout(()=>toApp(), 400);
+  }catch(e){
+    const el = $("#loginErr");
+    el.textContent = e.message || "Verifikasi gagal.";
+    show(el);
+  }
+});
+
+$("#btnPaste").addEventListener("click", async ()=>{
+  try{
+    const t = await navigator.clipboard.readText();
+    if(t) $("#loginToken").value = t;
+  }catch{ /* ignore */ }
+});
+
+$("#btnLogout").addEventListener("click", ()=>{
+  clearSession();
+  toLogin();
+});
+
+$("#btnCallApi").addEventListener("click", async ()=>{
+  hide($("#appOk")); hide($("#appErr"));
+  const s = loadSession();
+  if(!s || !s.ok){ toLogin(); return; }
+  // demo saja
+  const el = $("#appOk");
+  el.textContent = `Halo, user ${s.user?.telegram_id}. Ini respon dummy API di sisi klien.`;
+  show(el);
+});
+
+/* restore session on load */
+(function init(){
+  refreshModeTag();
+  renderTable();
+  const s = loadSession();
+  if(s && s.exp && Date.now() < s.exp){ toApp(); } else { toLogin(); }
+})();
+</script>
 </body>
 </html>
